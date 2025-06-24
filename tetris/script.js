@@ -1,15 +1,18 @@
-// 게임 설정
-const CANVAS_WIDTH = 200;
-const CANVAS_HEIGHT = 360;
-const BLOCK_SIZE = 20;
-const COLS = CANVAS_WIDTH / BLOCK_SIZE;
-const ROWS = CANVAS_HEIGHT / BLOCK_SIZE;
+// 설정
+const BLOCK_SIZE = 24;
+const COLS = 8;
+const ROWS = 15;
+const CANVAS_WIDTH = BLOCK_SIZE * COLS;
+const CANVAS_HEIGHT = BLOCK_SIZE * ROWS;
+const MAX_LIVES = 3;
 
-// 캔버스 설정
+// 캔버스
 const canvas = document.getElementById('gameCanvas');
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
 const ctx = canvas.getContext('2d');
 
-// 게임 상태
+// 상태
 let gameBoard = [];
 let currentPiece = null;
 let gameRunning = false;
@@ -17,56 +20,32 @@ let score = 0;
 let level = 1;
 let dropTime = 0;
 let lastTime = 0;
+let linesClearedTotal = 0;
+let lives = MAX_LIVES;
 
-// 테트리스 블록 모양 (7가지)
-const PIECES = [
-    // I
-    [
-        [1, 1, 1, 1]
-    ],
-    // O
-    [
-        [1, 1],
-        [1, 1]
-    ],
-    // T
-    [
-        [0, 1, 0],
-        [1, 1, 1]
-    ],
-    // S
-    [
-        [0, 1, 1],
-        [1, 1, 0]
-    ],
-    // Z
-    [
-        [1, 1, 0],
-        [0, 1, 1]
-    ],
-    // J
-    [
-        [1, 0, 0],
-        [1, 1, 1]
-    ],
-    // L
-    [
-        [0, 0, 1],
-        [1, 1, 1]
-    ]
-];
-
-// 기존 COLORS 배열을 아래로 교체
+// 파스텔톤 귀여운 색상
 const COLORS = [
-    '#AEEEEE', // 파스텔 하늘색
-    '#FFFACD', // 파스텔 노랑
+    '#AEEEEE', // 하늘
+    '#FFFACD', // 노랑
     '#E6E6FA', // 라벤더
     '#B0E57C', // 연두
     '#FFB6C1', // 연핑크
     '#B0C4DE', // 연보라
-    '#FFDAB9'  // 살구색
+    '#FFDAB9'  // 살구
 ];
-// 게임 보드 초기화
+
+// 블록 모양
+const PIECES = [
+    [[1, 1, 1, 1]],
+    [[1, 1], [1, 1]],
+    [[0, 1, 0], [1, 1, 1]],
+    [[0, 1, 1], [1, 1, 0]],
+    [[1, 1, 0], [0, 1, 1]],
+    [[1, 0, 0], [1, 1, 1]],
+    [[0, 0, 1], [1, 1, 1]]
+];
+
+// 보드 초기화
 function initBoard() {
     gameBoard = [];
     for (let row = 0; row < ROWS; row++) {
@@ -79,7 +58,6 @@ function initBoard() {
 
 function drawBoard() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    // 보드 그리기
     for (let row = 0; row < ROWS; row++) {
         for (let col = 0; col < COLS; col++) {
             if (gameBoard[row][col]) {
@@ -87,10 +65,7 @@ function drawBoard() {
             }
         }
     }
-    // 현재 조각 그리기
-    if (currentPiece) {
-        drawPiece();
-    }
+    if (currentPiece) drawPiece();
 }
 
 function drawBlock(x, y, colorIndex) {
@@ -100,7 +75,7 @@ function drawBlock(x, y, colorIndex) {
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 3;
     ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    // 살짝 그림자 효과
+    // 그림자 효과
     ctx.shadowColor = 'rgba(0,0,0,0.1)';
     ctx.shadowBlur = 4;
     ctx.shadowOffsetX = 2;
@@ -109,7 +84,6 @@ function drawBlock(x, y, colorIndex) {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-
 }
 
 function drawPiece() {
@@ -132,9 +106,8 @@ function createNewPiece() {
         y: 0,
         colorIndex: pieceIndex
     };
-    // 게임 오버 체크
     if (!isValidMove(currentPiece.x, currentPiece.y, currentPiece.shape)) {
-        gameOver();
+        loseLife();
     }
 }
 
@@ -144,12 +117,8 @@ function isValidMove(x, y, shape) {
             if (shape[row][col]) {
                 const newX = x + col;
                 const newY = y + row;
-                if (newX < 0 || newX >= COLS || newY >= ROWS) {
-                    return false;
-                }
-                if (newY >= 0 && gameBoard[newY][newX]) {
-                    return false;
-                }
+                if (newX < 0 || newX >= COLS || newY >= ROWS) return false;
+                if (newY >= 0 && gameBoard[newY][newX]) return false;
             }
         }
     }
@@ -212,7 +181,8 @@ function clearLines() {
     }
     if (linesCleared > 0) {
         score += linesCleared * 100 * level;
-        level = Math.floor(score / 1000) + 1;
+        linesClearedTotal += linesCleared;
+        level = Math.floor(linesClearedTotal / 10) + 1;
         updateDisplay();
     }
 }
@@ -222,7 +192,9 @@ function gameLoop(currentTime) {
     const deltaTime = currentTime - lastTime;
     lastTime = currentTime;
     dropTime += deltaTime;
-    if (dropTime > 1000 - (level * 50)) {
+    // 속도: 레벨이 올라갈수록 빨라짐 (최소 100ms)
+    let speed = Math.max(100, 700 - (level - 1) * 70);
+    if (dropTime > speed) {
         if (!movePiece(0, 1)) {
             placePiece();
         }
@@ -255,6 +227,8 @@ function startGame() {
     initBoard();
     score = 0;
     level = 1;
+    linesClearedTotal = 0;
+    lives = MAX_LIVES;
     gameRunning = true;
     lastTime = 0;
     dropTime = 0;
@@ -275,9 +249,21 @@ function pauseGame() {
     }
 }
 
+function loseLife() {
+    lives--;
+    updateDisplay();
+    if (lives > 0) {
+        alert(`블록이 쌓여서 한 번 실패! 남은 기회: ${lives}번`);
+        initBoard();
+        createNewPiece();
+    } else {
+        gameOver();
+    }
+}
+
 function gameOver() {
     gameRunning = false;
-    alert(`게임 오버! 최종 점수: ${score}`);
+    alert(`최종 게임 오버! 점수: ${score}`);
     document.getElementById('startBtn').disabled = false;
     document.getElementById('pauseBtn').disabled = true;
 }
@@ -285,12 +271,21 @@ function gameOver() {
 function updateDisplay() {
     document.getElementById('score').textContent = score;
     document.getElementById('level').textContent = level;
+    // 남은 기회 표시
+    let livesElem = document.getElementById('lives');
+    if (!livesElem) {
+        livesElem = document.createElement('div');
+        livesElem.id = 'lives';
+        livesElem.style.marginTop = '8px';
+        document.querySelector('.game-info').appendChild(livesElem);
+    }
+    livesElem.textContent = `남은 기회: ${lives}`;
 }
 
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('pauseBtn').addEventListener('click', pauseGame);
 
-// 모바일 터치 조작 추가 (옵션)
+// 모바일 터치 조작
 let touchStartX = null;
 let touchStartY = null;
 canvas.addEventListener('touchstart', function(e) {
