@@ -1,1 +1,45 @@
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Snake 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐍 Snake 게임</h1>
+        <div class="score">
+            점수: <span id="score">0</span>
+            <div class="game-buttons">
+                <button id="startBtn" class="start-btn">게임 시작</button>
+                <button id="restartBtn" class="restart-btn" style="display:none;">🔄 다시 시작</button>
+            </div>
+        </div>
+        
+        <!-- 게임 영역 (스와이프 제스처 지원) -->
+        <div class="game-area">
+            <canvas id="gameCanvas" width="300" height="300"></canvas>
+        </div>
+        
+        <!-- 작은 방향 버튼 (캔버스 밖) -->
+        <div class="mini-controls">
+            <div class="mini-control-row">
+                <button id="miniUpBtn" class="mini-btn">⬆️</button>
+            </div>
+            <div class="mini-control-row">
+                <button id="miniLeftBtn" class="mini-btn">⬅️</button>
+                <button id="miniRightBtn" class="mini-btn">➡️</button>
+            </div>
+            <div class="mini-control-row">
+                <button id="miniDownBtn" class="mini-btn">⬇️</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <p id="guideMsg">게임을 시작하려면 위 버튼을 누르세요!</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
