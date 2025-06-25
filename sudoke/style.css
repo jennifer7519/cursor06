@@ -1,0 +1,459 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 400px;
+    min-height: 100vh;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.screen.active {
+    display: block;
+}
+
+.container {
+    padding: 30px 15px;
+    text-align: center;
+}
+
+/* 시작 화면 */
+h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #4a5568;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.container > p {
+    font-size: 1rem;
+    color: #718096;
+    margin-bottom: 30px;
+}
+
+.difficulty-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.difficulty-btn {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.difficulty-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.difficulty-btn.easy {
+    border-color: #48bb78;
+}
+
+.difficulty-btn.easy:hover {
+    background: #f0fff4;
+    border-color: #38a169;
+}
+
+.difficulty-btn.medium {
+    border-color: #ed8936;
+}
+
+.difficulty-btn.medium:hover {
+    background: #fffaf0;
+    border-color: #dd6b20;
+}
+
+.difficulty-btn.hard {
+    border-color: #e53e3e;
+}
+
+.difficulty-btn.hard:hover {
+    background: #fff5f5;
+    border-color: #c53030;
+}
+
+.level {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.description {
+    display: block;
+    font-size: 0.85rem;
+    color: #718096;
+}
+
+/* 게임 화면 */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f7fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.back-btn, .hint-btn {
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.3s ease;
+}
+
+.back-btn:hover, .hint-btn:hover {
+    background: #2d3748;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+#difficulty-display {
+    font-weight: bold;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+#timer {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #2b6cb0;
+}
+
+.game-container {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 스도쿠 보드 */
+.sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+    background: #2d3748;
+    padding: 2px;
+    border-radius: 8px;
+    max-width: 100%;
+    aspect-ratio: 1;
+}
+
+.cell {
+    background: white;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell:hover {
+    background: #f7fafc;
+}
+
+.cell.selected {
+    background: #bee3f8;
+    color: #2b6cb0;
+}
+
+.cell.fixed {
+    background: #f7fafc;
+    color: #4a5568;
+    cursor: not-allowed;
+}
+
+.cell.error {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.cell.completed {
+    background: #c6f6d5;
+    color: #2f855a;
+}
+
+/* 3x3 박스 구분선 */
+.cell:nth-child(3n) {
+    border-right: 2px solid #2d3748;
+}
+
+.cell:nth-child(9n) {
+    border-right: none;
+}
+
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 2px solid #2d3748;
+}
+
+/* 숫자 패드 */
+.number-pad {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.number-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.number-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.number-btn:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    transform: scale(1.05);
+}
+
+.number-btn.clear {
+    background: #fed7d7;
+    color: #c53030;
+    border-color: #feb2b2;
+}
+
+.number-btn.clear:hover {
+    background: #feb2b2;
+}
+
+/* 게임 컨트롤 */
+.game-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.control-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 120px;
+}
+
+.control-btn.check {
+    background: #48bb78;
+    color: white;
+}
+
+.control-btn.check:hover {
+    background: #38a169;
+}
+
+.control-btn.new-game {
+    background: #4a5568;
+    color: white;
+}
+
+.control-btn.new-game:hover {
+    background: #2d3748;
+}
+
+/* 결과 화면 */
+.result-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.result-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #4a5568;
+    color: white;
+}
+
+.result-btn:hover {
+    background: #2d3748;
+    transform: translateY(-2px);
+}
+
+.result-info {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.result-info p {
+    margin: 8px 0;
+    font-size: 1rem;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+    .screen {
+        border-radius: 0;
+        min-height: 100vh;
+        max-width: 100%;
+    }
+    
+    .container {
+        padding: 20px 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .cell {
+        font-size: 0.9rem;
+    }
+    
+    .number-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .game-header {
+        padding: 12px;
+    }
+    
+    .game-container {
+        padding: 12px;
+        gap: 15px;
+    }
+    
+    .difficulty-btn {
+        padding: 15px 12px;
+    }
+    
+    .level {
+        font-size: 1.2rem;
+    }
+    
+    .description {
+        font-size: 0.8rem;
+    }
+    
+    .control-btn {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+        max-width: 100px;
+    }
+}
+
+/* 작은 화면 추가 최적화 */
+@media (max-width: 360px) {
+    .container {
+        padding: 15px 8px;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .cell {
+        font-size: 0.8rem;
+    }
+    
+    .number-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+    
+    .game-header {
+        padding: 10px;
+    }
+    
+    .game-container {
+        padding: 10px;
+        gap: 12px;
+    }
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.screen.active {
+    animation: fadeIn 0.5s ease;
+}
+
+/* 힌트 효과 */
+.cell.hint {
+    animation: hintPulse 1s ease;
+}
+
+@keyframes hintPulse {
+    0%, 100% {
+        background: white;
+    }
+    50% {
+        background: #bee3f8;
+    }
+} 
