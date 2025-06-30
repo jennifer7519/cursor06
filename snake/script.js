@@ -11,14 +11,14 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 
 // 게임 상태
-let snake = [{x: 10, y: 10}];
+let snake = [{x: 7, y: 7}];
 let food = {};
-let dx = 0;
+let dx = 1; // 오른쪽으로 시작
 let dy = 0;
 let score = 0;
 let gameRunning = false;
 let gameLoop;
-let foodTimeout;
+let foodRespawnTimer = null; // 음식 자동 리스폰 타이머 변수 추가
 
 // 스와이프 제스처 변수
 let startX = 0;
@@ -27,30 +27,45 @@ let endX = 0;
 let endY = 0;
 const minSwipeDistance = 30; // 최소 스와이프 거리
 
+// 음식 타입 정의
+const FOOD_TYPES = {
+    NORMAL: { type: 'normal', color: '#FF5722', points: 10, probability: 0.5, name: '일반 사과' },
+    GOLD: { type: 'gold', color: '#FFD700', points: 20, probability: 0.3, name: '골드 사과' },
+    POISON: { type: 'poison', color: '#9C27B0', points: 0, probability: 0.2, name: '독사과' }
+};
+
 // 초기화
 function init() {
-    snake = [{x: 7, y: 7}]; // 중앙에서 시작
-    dx = 1; // 오른쪽으로 시작
+    snake = [{x: 7, y: 7}];
+    dx = 1;
     dy = 0;
     score = 0;
     scoreElement.textContent = score;
     generateFood();
     draw();
+    clearInterval(gameLoop); // 혹시 남아있던 게임 루프 정지
+    clearTimeout(foodRespawnTimer); // 음식 리스폰 타이머 정지
+    foodRespawnTimer = null;
     console.log('게임 초기화 완료');
 }
 
-// 음식 생성
+// 음식 생성 (특수 음식 포함)
 function generateFood() {
     // 음식 타입 결정 (확률 기반)
     const random = Math.random();
     let foodType;
     
+    console.log('음식 생성 확률:', random);
+    
     if (random < FOOD_TYPES.NORMAL.probability) {
         foodType = FOOD_TYPES.NORMAL;
+        console.log('일반 사과 생성');
     } else if (random < FOOD_TYPES.NORMAL.probability + FOOD_TYPES.GOLD.probability) {
         foodType = FOOD_TYPES.GOLD;
+        console.log('골드 사과 생성! ⭐');
     } else {
         foodType = FOOD_TYPES.POISON;
+        console.log('독사과 생성! ☠️ 조심!');
     }
     
     food = {
@@ -69,13 +84,14 @@ function generateFood() {
             return;
         }
     }
-    // 음식이 5초 동안 먹히지 않으면 자동으로 새로운 음식 생성
-    clearTimeout(foodTimeout);
-    foodTimeout = setTimeout(() => {
-        generateFood();
-        draw();
+    // 음식 자동 리스폰 타이머 설정 (5초 후 음식 재생성)
+    if (foodRespawnTimer) clearTimeout(foodRespawnTimer);
+    foodRespawnTimer = setTimeout(() => {
+        if (gameRunning) {
+            generateFood();
+            draw();
+        }
     }, 5000);
-    
     console.log('음식 생성 완료:', food.name, food.points + '점', '위치:', food.x, food.y);
 }
 
@@ -147,17 +163,45 @@ function draw() {
         }
     }
     
-    // 음식 그리기 (사과 모양)
-    ctx.fillStyle = '#FF5722';
+    // 음식 그리기 (특수 음식 포함)
+    const foodX = food.x * gridSize + gridSize/2;
+    const foodY = food.y * gridSize + gridSize/2;
+    
+    // 음식 배경 (광택 효과)
+    if (food.type === 'gold') {
+        // 골드 사과는 반짝이는 효과
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+        ctx.beginPath();
+        ctx.arc(foodX, foodY, gridSize/2 + 2, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    
+    // 음식 본체
+    ctx.fillStyle = food.color;
     ctx.beginPath();
-    ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2 - 2, 0, 2 * Math.PI);
+    ctx.arc(foodX, foodY, gridSize/2 - 2, 0, 2 * Math.PI);
     ctx.fill();
     
-    // 사과 잎
-    ctx.fillStyle = '#4CAF50';
-    ctx.beginPath();
-    ctx.ellipse(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/4, 3, 2, 0, 0, 2 * Math.PI);
-    ctx.fill();
+    // 음식 타입별 특수 효과
+    if (food.type === 'gold') {
+        // 골드 사과는 별 모양 효과
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('⭐', foodX, foodY + 4);
+    } else if (food.type === 'poison') {
+        // 독사과는 해골 효과
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('☠️', foodX, foodY + 4);
+    } else {
+        // 일반 사과는 잎
+        ctx.fillStyle = '#4CAF50';
+        ctx.beginPath();
+        ctx.ellipse(foodX, foodY - gridSize/4, 3, 2, 0, 0, 2 * Math.PI);
+        ctx.fill();
+    }
 }
 
 // 방향 변경 함수 (진동 피드백 포함)
@@ -184,7 +228,6 @@ function update() {
     
     // 벽 충돌 체크
     if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-        clearTimeout(foodTimeout);
         gameOver();
         return;
     }
@@ -192,7 +235,6 @@ function update() {
     // 자기 몸 충돌 체크 (머리 제외)
     for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
-            clearTimeout(foodTimeout);
             gameOver();
             return;
         }
@@ -202,18 +244,25 @@ function update() {
     
     // 음식 먹기 체크
     if (head.x === food.x && head.y === food.y) {
-        clearTimeout(foodTimeout);
+        // 음식 타입별 처리
         if (food.type === 'poison') {
+            // 독사과 먹으면 게임 오버
             gameOver();
             return;
         } else {
+            // 일반 사과나 골드 사과
             score += food.points;
             scoreElement.textContent = score;
+            
+            // 점수 획득 메시지 표시
             showScoreMessage(food.points, food.name);
+            
             generateFood();
+            
+            // 음식 먹을 때 진동
             if (navigator.vibrate) {
                 if (food.type === 'gold') {
-                    navigator.vibrate([100, 50, 100, 50, 100]);
+                    navigator.vibrate([100, 50, 100, 50, 100]); // 골드 사과는 특별한 진동
                 } else {
                     navigator.vibrate([50, 50, 50]);
                 }
@@ -226,11 +275,21 @@ function update() {
     draw();
 }
 
+// 점수 메시지 표시
+function showScoreMessage(points, foodName) {
+    const message = `+${points}점 (${foodName})`;
+    console.log(message);
+    
+    // 화면에 임시 메시지 표시 (선택사항)
+    // 나중에 더 예쁜 UI로 개선 가능
+}
+
 // 게임 오버
 function gameOver() {
     gameRunning = false;
-    clearTimeout(foodTimeout);
     clearInterval(gameLoop);
+    clearTimeout(foodRespawnTimer); // 게임 오버 시 음식 리스폰 타이머 정지
+    foodRespawnTimer = null;
     
     // 게임 오버 진동
     if (navigator.vibrate) {
@@ -238,7 +297,8 @@ function gameOver() {
     }
     
     setTimeout(() => {
-        guideMsg.textContent = `게임 오버! 점수: ${score}`;
+        const reason = food.type === 'poison' ? '독사과를 먹었습니다!' : '벽이나 몸에 부딪혔습니다!';
+        guideMsg.textContent = `게임 오버! 점수: ${score} (${reason})`;
         restartBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
     }, 100);
@@ -337,7 +397,5 @@ window.onload = () => {
     guideMsg.textContent = '게임을 시작하려면 아래 버튼을 누르세요!';
     startBtn.style.display = 'inline-block';
     restartBtn.style.display = 'none';
-};
-
-// 초기 화면 그리기
-init(); 
+    init();
+}; 
