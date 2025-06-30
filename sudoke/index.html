@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스도쿠 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 시작 화면 -->
+    <div id="start-screen" class="screen active">
+        <div class="container">
+            <h1>🎯 스도쿠 게임</h1>
+            <p>난이도를 선택해주세요!</p>
+            
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn easy" onclick="startGame('easy')">
+                    <span class="level">초급</span>
+                    <span class="description">쉬워요! 36개 빈칸, 처음 시작하는 분들</span>
+                </button>
+                <button class="difficulty-btn medium" onclick="startGame('medium')">
+                    <span class="level">중급</span>
+                    <span class="description">보통이에요! 46개 빈칸, 경험자용</span>
+                </button>
+                <button class="difficulty-btn hard" onclick="startGame('hard')">
+                    <span class="level">고급</span>
+                    <span class="description">어려워요! 56개 빈칸, 고수용</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 화면 -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <button class="back-btn" onclick="showStartScreen()">← 뒤로</button>
+            <div class="game-info">
+                <span id="difficulty-display">난이도</span>
+                <span id="timer">00:00</span>
+            </div>
+            <button class="hint-btn" onclick="showHint()">💡 힌트</button>
+        </div>
+
+        <div class="game-container">
+            <div id="sudoku-board" class="sudoku-board"></div>
+            
+            <div class="number-pad">
+                <div class="number-row">
+                    <button class="number-btn" onclick="selectNumber(1)">1</button>
+                    <button class="number-btn" onclick="selectNumber(2)">2</button>
+                    <button class="number-btn" onclick="selectNumber(3)">3</button>
+                    <button class="number-btn" onclick="selectNumber(4)">4</button>
+                    <button class="number-btn" onclick="selectNumber(5)">5</button>
+                </div>
+                <div class="number-row">
+                    <button class="number-btn" onclick="selectNumber(6)">6</button>
+                    <button class="number-btn" onclick="selectNumber(7)">7</button>
+                    <button class="number-btn" onclick="selectNumber(8)">8</button>
+                    <button class="number-btn" onclick="selectNumber(9)">9</button>
+                    <button class="number-btn clear" onclick="clearCell()">지우기</button>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="control-btn check" onclick="checkSolution()">정답 확인</button>
+                <button class="control-btn new-game" onclick="newGame()">새 게임</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result-screen" class="screen">
+        <div class="container">
+            <h2 id="result-title">🎉 축하합니다!</h2>
+            <p id="result-message">스도쿠를 완성했습니다!</p>
+            <div class="result-info">
+                <p>소요 시간: <span id="final-time">00:00</span></p>
+                <p>난이도: <span id="final-difficulty">초급</span></p>
+            </div>
+            <div class="result-buttons">
+                <button class="result-btn" onclick="newGame()">다시 하기</button>
+                <button class="result-btn" onclick="showStartScreen()">메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="sudoku.js"></script>
+</body>
+</html> 

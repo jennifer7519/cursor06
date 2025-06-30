@@ -1,52 +1,15 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Snake 게임</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Jennifer's Game Collection</title>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🐍 Snake 게임</h1>
-        <div class="score">
-            점수: <span id="score">0</span>
-            <div class="game-buttons">
-                <button id="startBtn" class="start-btn">게임 시작</button>
-                <button id="restartBtn" class="restart-btn" style="display:none;">🔄 다시 시작</button>
-            </div>
-        </div>
-        
-        <!-- 음식 가이드 -->
-        <div class="food-guide">
-            <span class="food-item">🍎 일반 사과: 10점</span>
-            <span class="food-item">⭐ 골드 사과: 20점</span>
-            <span class="food-item">☠️ 독사과: 게임 오버</span>
-        </div>
-        
-        <!-- 게임 영역 (스와이프 제스처 지원) -->
-        <div class="game-area">
-            <canvas id="gameCanvas" width="300" height="300"></canvas>
-        </div>
-        
-        <!-- 작은 방향 버튼 (캔버스 밖) -->
-        <div class="mini-controls">
-            <div class="mini-control-row">
-                <button id="miniUpBtn" class="mini-btn">⬆️</button>
-            </div>
-            <div class="mini-control-row">
-                <button id="miniLeftBtn" class="mini-btn">⬅️</button>
-                <button id="miniRightBtn" class="mini-btn">➡️</button>
-            </div>
-            <div class="mini-control-row">
-                <button id="miniDownBtn" class="mini-btn">⬇️</button>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <p id="guideMsg">게임을 시작하려면 위 버튼을 누르세요!</p>
-        </div>
+    <h1>🎮 My Games</h1>
+    <div>
+        <a href="./snake/">🐍 Snake Game</a><br>
+        <a href="./onecard/">🎯 One Card</a><br>
+        <a href="./tetris/">🧩 Tetris</a><br>
+        <a href="./sudoke/">🔢 sudoke</a><br>
     </div>
-    <script src="script.js"></script>
 </body>
-</html> 
+</html>

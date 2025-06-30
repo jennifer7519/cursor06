@@ -1,0 +1,322 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.game-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.score {
+    font-size: 18px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.start-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.start-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.game-area {
+    position: relative;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+#gameCanvas {
+    border: 3px solid #333;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* 작은 방향 버튼 스타일 */
+.mini-controls {
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    margin: 10px auto;
+    display: inline-block;
+    width: fit-content;
+}
+
+.mini-control-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin: 2px 0;
+}
+
+.mini-btn {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 다시 시작 버튼은 더 넓게 */
+#restartBtn.mini-btn {
+    width: 80px;
+    font-size: 12px;
+    background: #FF9800;
+}
+
+#restartBtn.mini-btn:hover {
+    background: #F57C00;
+}
+
+.mini-btn:hover {
+    background: #45a049;
+    transform: scale(1.1);
+}
+
+.mini-btn:active {
+    transform: scale(0.95);
+}
+
+.controls {
+    margin-top: 15px;
+}
+
+.controls p {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+button {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+    .game-container {
+        padding: 10px;
+        margin: 5px;
+        border-radius: 15px;
+    }
+    
+    h1 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .score {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    .game-buttons {
+        gap: 8px;
+    }
+    
+    .start-btn, .restart-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    #gameCanvas {
+        width: 280px;
+        height: 280px;
+    }
+    
+    .mini-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .mini-controls {
+        padding: 10px;
+        margin: 8px auto;
+    }
+}
+
+/* 매우 작은 화면 (iPhone SE 등) */
+@media (max-width: 375px) {
+    .game-container {
+        padding: 8px;
+    }
+    
+    h1 {
+        font-size: 16px;
+    }
+    
+    .score {
+        font-size: 14px;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .game-buttons {
+        gap: 5px;
+    }
+    
+    .start-btn, .restart-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    
+    #gameCanvas {
+        width: 260px;
+        height: 260px;
+    }
+    
+    .mini-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+}
+
+/* 가로 모드 최적화 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .game-container {
+        padding: 5px;
+        max-width: 100%;
+    }
+    
+    h1 {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .score {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    
+    #gameCanvas {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .mini-controls {
+        margin: 5px auto;
+        padding: 5px;
+    }
+    
+    .mini-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}
+
+/* 터치 최적화 */
+@media (hover: none) and (pointer: coarse) {
+    .mini-btn {
+        min-height: 44px; /* 터치 최소 크기 */
+        min-width: 44px;
+    }
+    
+    button {
+        min-height: 44px;
+        padding: 15px 30px;
+    }
+}
+
+.restart-btn {
+    background: #FF9800;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.restart-btn:hover {
+    background: #F57C00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+} 
