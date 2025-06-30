@@ -339,5 +339,5 @@ window.onload = () => {
     restartBtn.style.display = 'none';
 };
 
-// 초기 화면 그리기
+// 초기 ㄹ화면 그리기
 init(); 
