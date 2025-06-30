@@ -319,4 +319,40 @@ button:disabled {
     background: #F57C00;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+/* 음식 가이드 스타일 */
+.food-guide {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.food-item {
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.food-item:nth-child(1) {
+    background: rgba(255, 87, 34, 0.2);
+    color: #D84315;
+}
+
+.food-item:nth-child(2) {
+    background: rgba(255, 215, 0, 0.2);
+    color: #F57F17;
+}
+
+.food-item:nth-child(3) {
+    background: rgba(156, 39, 176, 0.2);
+    color: #7B1FA2;
 } 
