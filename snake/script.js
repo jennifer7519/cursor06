@@ -18,6 +18,7 @@ let dy = 0;
 let score = 0;
 let gameRunning = false;
 let gameLoop;
+let foodTimeout;
 
 // 스와이프 제스처 변수
 let startX = 0;
@@ -40,9 +41,25 @@ function init() {
 
 // 음식 생성
 function generateFood() {
+    // 음식 타입 결정 (확률 기반)
+    const random = Math.random();
+    let foodType;
+    
+    if (random < FOOD_TYPES.NORMAL.probability) {
+        foodType = FOOD_TYPES.NORMAL;
+    } else if (random < FOOD_TYPES.NORMAL.probability + FOOD_TYPES.GOLD.probability) {
+        foodType = FOOD_TYPES.GOLD;
+    } else {
+        foodType = FOOD_TYPES.POISON;
+    }
+    
     food = {
         x: Math.floor(Math.random() * tileCount),
-        y: Math.floor(Math.random() * tileCount)
+        y: Math.floor(Math.random() * tileCount),
+        type: foodType.type,
+        color: foodType.color,
+        points: foodType.points,
+        name: foodType.name
     };
     
     // 뱀과 겹치지 않도록
@@ -52,7 +69,14 @@ function generateFood() {
             return;
         }
     }
-    console.log('음식 생성:', food);
+    // 음식이 5초 동안 먹히지 않으면 자동으로 새로운 음식 생성
+    clearTimeout(foodTimeout);
+    foodTimeout = setTimeout(() => {
+        generateFood();
+        draw();
+    }, 5000);
+    
+    console.log('음식 생성 완료:', food.name, food.points + '점', '위치:', food.x, food.y);
 }
 
 // 그리기 함수
@@ -160,6 +184,7 @@ function update() {
     
     // 벽 충돌 체크
     if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+        clearTimeout(foodTimeout);
         gameOver();
         return;
     }
@@ -167,6 +192,7 @@ function update() {
     // 자기 몸 충돌 체크 (머리 제외)
     for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
+            clearTimeout(foodTimeout);
             gameOver();
             return;
         }
@@ -176,13 +202,22 @@ function update() {
     
     // 음식 먹기 체크
     if (head.x === food.x && head.y === food.y) {
-        score += 10;
-        scoreElement.textContent = score;
-        generateFood();
-        
-        // 음식 먹을 때 진동
-        if (navigator.vibrate) {
-            navigator.vibrate([50, 50, 50]);
+        clearTimeout(foodTimeout);
+        if (food.type === 'poison') {
+            gameOver();
+            return;
+        } else {
+            score += food.points;
+            scoreElement.textContent = score;
+            showScoreMessage(food.points, food.name);
+            generateFood();
+            if (navigator.vibrate) {
+                if (food.type === 'gold') {
+                    navigator.vibrate([100, 50, 100, 50, 100]);
+                } else {
+                    navigator.vibrate([50, 50, 50]);
+                }
+            }
         }
     } else {
         snake.pop();
@@ -194,6 +229,7 @@ function update() {
 // 게임 오버
 function gameOver() {
     gameRunning = false;
+    clearTimeout(foodTimeout);
     clearInterval(gameLoop);
     
     // 게임 오버 진동
