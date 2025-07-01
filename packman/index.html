@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Pac-Man Game</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    #gameCanvas {
+      background: #222;
+      display: block;
+      margin: 0 auto;
+      border: 4px solid #fff;
+      width: 98vw;
+      max-width: 800px;
+      height: 49vw;
+      max-height: 400px;
+      aspect-ratio: 2 / 1;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="stageSelect" style="position:absolute;left:0;top:0;width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#222;z-index:10;">
+    <h1 style="color:#fff;margin-bottom:32px;">스테이지 선택</h1>
+    <div style="display:flex;gap:24px;">
+      <button class="stage-btn" data-stage="1">Stage 1</button>
+      <button class="stage-btn" data-stage="2">Stage 2</button>
+      <button class="stage-btn" data-stage="3">Stage 3</button>
+      <button class="stage-btn" data-stage="4">Stage 4</button>
+      <button class="stage-btn" data-stage="5">Stage 5</button>
+    </div>
+  </div>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <script src="game.js"></script>
+  <script>
+    document.querySelectorAll('.stage-btn').forEach(btn => {
+      btn.onclick = function() {
+        window.selectedStage = Number(this.dataset.stage);
+        document.getElementById('stageSelect').style.display = 'none';
+        if(window.startStageGame) window.startStageGame(window.selectedStage);
+      };
+    });
+  </script>
+</body>
+</html> 
